@@ -150,14 +150,14 @@ const Header: React.FC = () => {
                 >
                   <Link
                     to={item.to}
-                    className="relative text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-all duration-300 font-semibold group px-4 py-2 rounded-xl hover:bg-purple-50 dark:hover:bg-purple-900/20"
+                    className="relative text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-all duration-300 font-semibold group px-4 py-2 rounded-xl hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:scale-105 hover:shadow-lg"
                   >
-                    <span className="flex items-center space-x-2 rtl:space-x-reverse">
-                      <span className="text-sm">{item.icon}</span>
+                    <span className="flex items-center space-x-2 rtl:space-x-reverse group-hover:animate-pulse">
+                      <span className="text-sm group-hover:scale-125 transition-transform duration-300">{item.icon}</span>
                       <span>{item.label}</span>
                     </span>
                     <motion.span 
-                      className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 group-hover:w-full transition-all duration-300"
+                      className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-purple-500 to-pink-500 group-hover:w-full transition-all duration-300 rounded-full"
                       whileHover={{ width: "100%" }}
                     />
                   </Link>
