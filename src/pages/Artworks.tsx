@@ -273,22 +273,25 @@ const Artworks: React.FC = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4, duration: 0.6 }}
-                className={`grid gap-6 auto-rows-fr ${
+                className={`grid gap-6 ${
                   viewMode === 'grid'
-                    ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5'
+                    ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'
                     : 'grid-cols-1'
                 }`}
               >
                 {sortedArtworks.map((artwork, index) => (
-                  <div
+                  <motion.div
                     key={artwork.id}
-                    className="w-full h-full"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05, duration: 0.4 }}
+                    className="w-full"
                   >
                     <ArtworkCard 
                       artwork={artwork} 
                       index={index}
                     />
-                  </div>
+                  </motion.div>
                 ))}
               </motion.div>
             )}
