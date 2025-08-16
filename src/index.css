@@ -2,6 +2,31 @@
 @tailwind components;
 @tailwind utilities;
 
+/* RTL Support */
+[dir="rtl"] {
+  text-align: right;
+}
+
+[dir="rtl"] .rtl\:space-x-reverse > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+}
+
+[dir="rtl"] .rtl\:text-right {
+  text-align: right;
+}
+
+[dir="rtl"] .rtl\:text-left {
+  text-align: left;
+}
+
+[dir="rtl"] .rtl\:mr-0 {
+  margin-right: 0;
+}
+
+[dir="rtl"] .rtl\:ml-3 {
+  margin-left: 0.75rem;
+}
+
 /* Custom scrollbar for dark mode */
 @layer base {
   ::-webkit-scrollbar {

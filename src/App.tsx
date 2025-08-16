@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import './i18n';
 import { useThemeStore } from './stores/themeStore';
 import Header from './components/Layout/Header';
@@ -16,6 +17,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 
 function App() {
+  const { i18n } = useTranslation();
   const { isDark } = useThemeStore();
   
   // Apply theme class to document
@@ -26,6 +28,13 @@ function App() {
       document.documentElement.classList.remove('dark');
     }
   }, [isDark]);
+
+  // Apply RTL direction for Arabic
+  React.useEffect(() => {
+    const isRTL = i18n.language === 'ar';
+    document.dir = isRTL ? 'rtl' : 'ltr';
+    document.documentElement.lang = i18n.language;
+  }, [i18n.language]);
 
   return (
     <Router>
