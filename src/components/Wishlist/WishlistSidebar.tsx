@@ -70,7 +70,7 @@ const WishlistSidebar: React.FC = () => {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {items.map((item) => (
+                    {items.filter(item => item && item.artwork).map((item) => (
                       <motion.div
                         key={item.artwork.id}
                         layout
