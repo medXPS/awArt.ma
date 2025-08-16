@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowRight, Palette, Award, Users, Star, Play, Sparkles, TrendingUp, Heart, Eye, Zap, Shield, Globe, Search, ChevronDown } from 'lucide-react';
-import { motion, useScroll, useTransform, useInView, useMotionValue, useSpring } from 'framer-motion';
+import { motion, useScroll, useTransform, useInView } from 'framer-motion';
 import { useArtworkStore } from '../stores/artworkStore';
 import ArtworkCard from '../components/Common/ArtworkCard';
 import SearchBar from '../components/Common/SearchBar';
@@ -18,28 +18,15 @@ const Home: React.FC = () => {
   const featuresRef = useRef(null);
   const artworksRef = useRef(null);
   const statsRef = useRef(null);
-  const gravityRef = useRef(null);
 
   const { scrollYProgress } = useScroll();
-  const y = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
+  const y = useTransform(scrollYProgress, [0, 1], ['0%', '30%']);
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
   const heroInView = useInView(heroRef, { once: true, margin: "-100px" });
   const featuresInView = useInView(featuresRef, { once: true, margin: "-100px" });
   const artworksInView = useInView(artworksRef, { once: true, margin: "-100px" });
   const statsInView = useInView(statsRef, { once: true, margin: "-100px" });
-  const gravityInView = useInView(gravityRef, { once: true, margin: "-100px" });
-
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  const springX = useSpring(mouseX, { stiffness: 300, damping: 30 });
-  const springY = useSpring(mouseY, { stiffness: 300, damping: 30 });
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    mouseX.set(e.clientX - rect.left - rect.width / 2);
-    mouseY.set(e.clientY - rect.top - rect.height / 2);
-  };
 
   const handleSearch = (query: string) => {
     setFilters({ search: query });
@@ -77,95 +64,41 @@ const Home: React.FC = () => {
     }
   ];
 
-  // Floating art pieces for gravity effect
-  const floatingArtworks = featuredArtworks.slice(0, 12);
-
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 overflow-hidden">
-      {/* Hero Section with Gravity Effect */}
+      {/* Hero Section */}
       <motion.section
         ref={heroRef}
         style={{ y, opacity }}
         className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-pink-900/20"
-        onMouseMove={handleMouseMove}
       >
-        {/* Animated Background Elements */}
+        {/* Simple Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
           <motion.div
             animate={{
-              rotate: [0, 360],
-              scale: [1, 1.2, 1],
-            }}
-            transition={{
-              duration: 20,
-              repeat: Infinity,
-              ease: "linear"
-            }}
-            className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-purple-400/30 to-pink-400/30 rounded-full blur-3xl"
-          />
-          <motion.div
-            animate={{
-              rotate: [360, 0],
-              scale: [1, 1.3, 1],
-            }}
-            transition={{
-              duration: 25,
-              repeat: Infinity,
-              ease: "linear"
-            }}
-            className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-r from-orange-400/30 to-yellow-400/30 rounded-full blur-3xl"
-          />
-          <motion.div
-            animate={{
-              y: [0, -20, 0],
-              x: [0, 10, 0],
+              scale: [1, 1.1, 1],
+              opacity: [0.3, 0.5, 0.3],
             }}
             transition={{
               duration: 8,
               repeat: Infinity,
               ease: "easeInOut"
             }}
-            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r from-blue-400/20 to-cyan-400/20 rounded-full blur-2xl"
+            className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-purple-400/30 to-pink-400/30 rounded-full blur-3xl"
           />
-        </div>
-
-        {/* Floating Artworks - Gravity Effect */}
-        <div className="absolute inset-0 pointer-events-none">
-          {floatingArtworks.map((artwork, index) => (
-            <motion.div
-              key={artwork.id}
-              className="absolute w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden shadow-2xl opacity-80"
-              style={{
-                left: `${10 + (index % 4) * 20}%`,
-                top: `${15 + Math.floor(index / 4) * 25}%`,
-                x: useTransform(springX, [-500, 500], [-20 - index * 2, 20 + index * 2]),
-                y: useTransform(springY, [-500, 500], [-15 - index * 1.5, 15 + index * 1.5]),
-              }}
-              animate={{
-                y: [0, -10, 0],
-                rotate: [0, 5, -5, 0],
-                scale: [1, 1.05, 1],
-              }}
-              transition={{
-                duration: 4 + index * 0.5,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: index * 0.2,
-              }}
-              whileHover={{
-                scale: 1.2,
-                rotate: 10,
-                transition: { duration: 0.3 }
-              }}
-            >
-              <img
-                src={artwork.imageUrl}
-                alt={artwork.title}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-            </motion.div>
-          ))}
+          <motion.div
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.2, 0.4, 0.2],
+            }}
+            transition={{
+              duration: 10,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 2
+            }}
+            className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-r from-orange-400/30 to-yellow-400/30 rounded-full blur-3xl"
+          />
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -178,48 +111,22 @@ const Home: React.FC = () => {
               className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-full text-sm font-medium text-purple-700 dark:text-purple-300 mb-8 border border-purple-200/50 dark:border-purple-700/50 backdrop-blur-sm"
             >
               <Sparkles className="h-4 w-4 mr-2" />
-              <motion.span
-                animate={{ opacity: [1, 0.7, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              >
-                Discover Authentic Moroccan Art
-              </motion.span>
+              <span>Discover Authentic Moroccan Art</span>
             </motion.div>
 
-            {/* Main Title with Gravity Effect */}
+            {/* Main Title */}
             <motion.h1
               initial={{ opacity: 0, y: 30 }}
               animate={heroInView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: 0.4, duration: 0.8 }}
               className="text-6xl md:text-8xl font-bold leading-tight mb-8"
             >
-              <motion.span 
-                className="block bg-gradient-to-r from-gray-900 via-purple-600 to-pink-600 dark:from-white dark:via-purple-400 dark:to-pink-400 bg-clip-text text-transparent"
-                animate={{
-                  backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
-                }}
-                transition={{
-                  duration: 5,
-                  repeat: Infinity,
-                  ease: "linear"
-                }}
-              >
-                Art Has
-              </motion.span>
-              <motion.span 
-                className="block bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent"
-                animate={{
-                  scale: [1, 1.05, 1],
-                  rotate: [0, 1, -1, 0],
-                }}
-                transition={{
-                  duration: 4,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-              >
-                Gravity
-              </motion.span>
+              <span className="block bg-gradient-to-r from-gray-900 via-purple-600 to-pink-600 dark:from-white dark:via-purple-400 dark:to-pink-400 bg-clip-text text-transparent">
+                Discover
+              </span>
+              <span className="block bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent">
+                Moroccan Art
+              </span>
             </motion.h1>
 
             <motion.p
@@ -228,15 +135,11 @@ const Home: React.FC = () => {
               transition={{ delay: 0.6, duration: 0.8 }}
               className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-12 leading-relaxed max-w-4xl mx-auto"
             >
-              Experience the magnetic pull of authentic Moroccan artistry. 
+              Experience the beauty of authentic Moroccan artistry. 
               <br />
-              <motion.span
-                animate={{ opacity: [0.7, 1, 0.7] }}
-                transition={{ duration: 3, repeat: Infinity }}
-                className="text-purple-600 dark:text-purple-400 font-semibold"
-              >
+              <span className="text-purple-600 dark:text-purple-400 font-semibold">
                 Where culture meets creativity, and art finds its home.
-              </motion.span>
+              </span>
             </motion.p>
 
             {/* CTA Buttons */}
@@ -247,25 +150,20 @@ const Home: React.FC = () => {
               className="flex flex-col sm:flex-row gap-6 justify-center mb-16"
             >
               <motion.div 
-                whileHover={{ scale: 1.05, y: -5 }} 
+                whileHover={{ scale: 1.05 }} 
                 whileTap={{ scale: 0.95 }}
               >
                 <Link
                   to="/artworks"
                   className="group inline-flex items-center justify-center px-10 py-5 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 text-white rounded-2xl hover:from-purple-700 hover:via-pink-700 hover:to-orange-700 transition-all duration-300 font-semibold text-lg shadow-2xl hover:shadow-purple-500/25"
                 >
-                  <motion.span
-                    animate={{ x: [0, 5, 0] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                  >
-                    Explore the Gallery
-                  </motion.span>
+                  Explore the Gallery
                   <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-2 transition-transform" />
                 </Link>
               </motion.div>
               
               <motion.div 
-                whileHover={{ scale: 1.05, y: -5 }} 
+                whileHover={{ scale: 1.05 }} 
                 whileTap={{ scale: 0.95 }}
               >
                 <button className="group inline-flex items-center justify-center px-10 py-5 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-2xl hover:border-purple-500 hover:text-purple-600 dark:hover:text-purple-400 transition-all duration-300 font-semibold text-lg backdrop-blur-sm bg-white/50 dark:bg-gray-800/50 shadow-xl">
@@ -309,100 +207,6 @@ const Home: React.FC = () => {
         </div>
       </motion.section>
 
-      {/* Art Gravity Section */}
-      <motion.section
-        ref={gravityRef}
-        className="py-24 bg-gradient-to-br from-gray-900 via-purple-900 to-pink-900 relative overflow-hidden"
-      >
-        <div className="absolute inset-0">
-          <motion.div
-            animate={{
-              scale: [1, 1.2, 1],
-              rotate: [0, 180, 360],
-            }}
-            transition={{
-              duration: 30,
-              repeat: Infinity,
-              ease: "linear"
-            }}
-            className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full blur-3xl"
-          />
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={gravityInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-5xl md:text-6xl font-bold text-white mb-8">
-              <motion.span
-                animate={{
-                  textShadow: [
-                    '0 0 20px rgba(168, 85, 247, 0.5)',
-                    '0 0 40px rgba(236, 72, 153, 0.5)',
-                    '0 0 20px rgba(168, 85, 247, 0.5)',
-                  ]
-                }}
-                transition={{ duration: 3, repeat: Infinity }}
-              >
-                The Gravity of Art
-              </motion.span>
-            </h2>
-            <p className="text-xl text-purple-100 max-w-4xl mx-auto leading-relaxed">
-              Just like gravity pulls objects together, great art has an invisible force that draws hearts, 
-              minds, and souls into its orbit. Experience the magnetic attraction of Moroccan creativity.
-            </p>
-          </motion.div>
-
-          {/* Orbiting Artworks */}
-          <div className="relative h-96 flex items-center justify-center">
-            <motion.div
-              className="absolute w-32 h-32 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-2xl"
-              animate={{
-                scale: [1, 1.1, 1],
-                boxShadow: [
-                  '0 0 50px rgba(168, 85, 247, 0.5)',
-                  '0 0 100px rgba(236, 72, 153, 0.7)',
-                  '0 0 50px rgba(168, 85, 247, 0.5)',
-                ]
-              }}
-              transition={{ duration: 4, repeat: Infinity }}
-            >
-              <Palette className="h-16 w-16 text-white" />
-            </motion.div>
-
-            {/* Orbiting Elements */}
-            {[...Array(8)].map((_, index) => (
-              <motion.div
-                key={index}
-                className="absolute w-16 h-16 rounded-xl overflow-hidden shadow-xl"
-                style={{
-                  transformOrigin: '150px 150px',
-                }}
-                animate={{
-                  rotate: [0, 360],
-                }}
-                transition={{
-                  duration: 20 + index * 2,
-                  repeat: Infinity,
-                  ease: "linear",
-                  delay: index * 0.5,
-                }}
-              >
-                <img
-                  src={featuredArtworks[index % featuredArtworks.length]?.imageUrl}
-                  alt="Artwork"
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </motion.section>
-
       {/* Stats Section */}
       <motion.section
         ref={statsRef}
@@ -420,7 +224,7 @@ const Home: React.FC = () => {
                 className="text-center text-white"
               >
                 <motion.div
-                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  whileHover={{ scale: 1.1 }}
                   className={`bg-gradient-to-r ${stat.color} w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-2xl`}
                 >
                   <stat.icon className="h-8 w-8 text-white" />
@@ -473,7 +277,7 @@ const Home: React.FC = () => {
                 <div className="absolute inset-0 bg-gradient-to-r from-white to-gray-50 dark:from-gray-700 dark:to-gray-800 rounded-3xl shadow-lg group-hover:shadow-2xl transition-all duration-300"></div>
                 <div className="relative p-8 text-center">
                   <motion.div
-                    whileHover={{ scale: 1.1, rotate: 5 }}
+                    whileHover={{ scale: 1.1 }}
                     className={`bg-gradient-to-r ${feature.gradient} w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-2xl`}
                   >
                     <feature.icon className="h-8 w-8 text-white" />
@@ -546,25 +350,26 @@ const Home: React.FC = () => {
         <div className="absolute inset-0">
           <motion.div
             animate={{
-              scale: [1, 1.2, 1],
-              rotate: [0, 180, 360],
+              scale: [1, 1.1, 1],
+              opacity: [0.1, 0.2, 0.1],
             }}
             transition={{
-              duration: 30,
+              duration: 12,
               repeat: Infinity,
-              ease: "linear"
+              ease: "easeInOut"
             }}
             className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-full blur-3xl"
           />
           <motion.div
             animate={{
-              scale: [1, 1.3, 1],
-              rotate: [360, 180, 0],
+              scale: [1, 1.2, 1],
+              opacity: [0.1, 0.15, 0.1],
             }}
             transition={{
-              duration: 25,
+              duration: 15,
               repeat: Infinity,
-              ease: "linear"
+              ease: "easeInOut",
+              delay: 3
             }}
             className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-r from-orange-500/20 to-yellow-500/20 rounded-full blur-3xl"
           />
@@ -577,25 +382,15 @@ const Home: React.FC = () => {
             transition={{ duration: 0.8 }}
           >
             <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
-              Ready to Feel the
+              Ready to Discover
               <br />
-              <motion.span 
-                className="bg-gradient-to-r from-purple-400 via-pink-400 to-orange-400 bg-clip-text text-transparent"
-                animate={{
-                  backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
-                }}
-                transition={{
-                  duration: 5,
-                  repeat: Infinity,
-                  ease: "linear"
-                }}
-              >
-                Gravity of Art?
-              </motion.span>
+              <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-orange-400 bg-clip-text text-transparent">
+                Moroccan Art?
+              </span>
             </h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-12">
               Join thousands of art enthusiasts and discover your next favorite piece from Morocco's finest artists. 
-              Let art's natural force draw you into a world of creativity and culture.
+              Experience the beauty and culture of authentic Moroccan creativity.
             </p>
             
             {/* CTA Search */}
