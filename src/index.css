@@ -98,6 +98,11 @@ html {
     -webkit-line-clamp: 4;
   }
   
+  /* Perfect square aspect ratio utility */
+  .aspect-square {
+    aspect-ratio: 1 / 1;
+  }
+  
   /* Backdrop blur support */
   .backdrop-blur-xl {
     backdrop-filter: blur(24px);
