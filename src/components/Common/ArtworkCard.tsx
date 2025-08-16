@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ShoppingCart, Heart, Eye, Star, User } from 'lucide-react';
+import { ShoppingCart, Heart, Eye, Star, User, Palette } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { Artwork } from '../../stores/artworkStore';
