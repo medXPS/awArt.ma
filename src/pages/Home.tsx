@@ -355,7 +355,7 @@ const Home: React.FC = () => {
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Link>
             </motion.div>
-          </div>
+          </motion.div>
         </div>
       </motion.section>
 
