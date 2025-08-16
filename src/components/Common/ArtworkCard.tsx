@@ -65,17 +65,17 @@ const ArtworkCard: React.FC<ArtworkCardProps> = ({ artwork, index = 0 }) => {
         <div className="bg-white dark:bg-gray-800 rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 dark:border-gray-700 h-full flex flex-col group-hover:scale-[1.02] group-hover:-translate-y-2">
           
           {/* Image Container - Fixed Height */}
-          <div className="relative w-full h-0 pb-[100%] overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800">
+          <div className="relative w-full aspect-square overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800">
             {/* Loading Skeleton */}
             {!imageLoaded && !imageError && (
-              <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700 animate-pulse" />
+              <div className="w-full h-full bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700 animate-pulse" />
             )}
             
             {!imageError ? (
               <img
                 src={artwork.imageUrl}
                 alt={artwork.title}
-                className={`absolute inset-0 w-full h-full object-cover transition-all duration-300 ${
+                className={`w-full h-full object-cover transition-all duration-300 ${
                   imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
                 } group-hover:scale-105`}
                 loading="lazy"
@@ -83,13 +83,13 @@ const ArtworkCard: React.FC<ArtworkCardProps> = ({ artwork, index = 0 }) => {
                 onError={handleImageError}
               />
             ) : (
-              <div className="absolute inset-0 w-full h-full flex items-center justify-center bg-gray-200 dark:bg-gray-700">
+              <div className="w-full h-full flex items-center justify-center bg-gray-200 dark:bg-gray-700">
                 <Palette className="h-16 w-16 text-gray-400 dark:text-gray-500" />
               </div>
             )}
             
             {/* Gradient Overlay */}
-            <div className="absolute inset-0 w-full h-full bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             
             {/* Top Badges */}
             <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
