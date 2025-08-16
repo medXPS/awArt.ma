@@ -81,6 +81,13 @@ html {
     -webkit-line-clamp: 3;
   }
   
+  .line-clamp-4 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+  }
+  
   /* Backdrop blur support */
   .backdrop-blur-xl {
     backdrop-filter: blur(24px);
