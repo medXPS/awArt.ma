@@ -39,7 +39,7 @@ export const useWishlistStore = create<WishlistState>()(
         }));
       },
       isInWishlist: (artworkId) => {
-        return get().items.some(item => item.artwork.id === artworkId);
+        return get().items.some(item => item.artwork && item.artwork.id === artworkId);
       },
       toggleWishlist: () => {
         set(state => ({ isOpen: !state.isOpen }));
