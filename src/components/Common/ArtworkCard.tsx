@@ -37,7 +37,7 @@ const ArtworkCard: React.FC<ArtworkCardProps> = ({ artwork, index = 0 }) => {
       className="group"
     >
       <Link to={`/artwork/${artwork.id}`} className="block">
-        <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700">
           {/* Image Container */}
           <div className="relative aspect-square overflow-hidden bg-gray-100">
             <img
@@ -53,12 +53,12 @@ const ArtworkCard: React.FC<ArtworkCardProps> = ({ artwork, index = 0 }) => {
               <button
                 onClick={handleAddToCart}
                 disabled={artwork.stock === 0}
-                className="bg-white text-gray-900 p-2 rounded-full shadow-lg hover:bg-emerald-50 hover:text-emerald-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-2 rounded-full shadow-lg hover:bg-purple-50 dark:hover:bg-purple-900/30 hover:text-purple-600 dark:hover:text-purple-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 title={artwork.stock === 0 ? t('outOfStock') : t('addToCart')}
               >
                 <ShoppingCart className="h-5 w-5" />
               </button>
-              <button className="bg-white text-gray-900 p-2 rounded-full shadow-lg hover:bg-red-50 hover:text-red-600 transition-colors">
+              <button className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-2 rounded-full shadow-lg hover:bg-red-50 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 transition-colors">
                 <Heart className="h-5 w-5" />
               </button>
             </div>
@@ -87,11 +87,11 @@ const ArtworkCard: React.FC<ArtworkCardProps> = ({ artwork, index = 0 }) => {
           {/* Content */}
           <div className="p-6">
             <div className="flex items-start justify-between mb-2">
-              <h3 className="text-lg font-semibold text-gray-900 group-hover:text-emerald-600 transition-colors line-clamp-1">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors line-clamp-1">
                 {artwork.title}
               </h3>
               <div className="text-right">
-                <p className="text-xl font-bold text-emerald-600">
+                <p className="text-xl font-bold text-purple-600 dark:text-purple-400">
                   ${artwork.price}
                 </p>
                 {artwork.stock > 0 && artwork.stock <= 5 && (
@@ -102,18 +102,18 @@ const ArtworkCard: React.FC<ArtworkCardProps> = ({ artwork, index = 0 }) => {
               </div>
             </div>
 
-            <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
               {artwork.description}
             </p>
 
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-500">by</span>
-                <span className="text-sm font-medium text-gray-700">
+                <span className="text-sm text-gray-500 dark:text-gray-400">by</span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   {artwork.artistName}
                 </span>
               </div>
-              <span className="text-sm text-gray-500">
+              <span className="text-sm text-gray-500 dark:text-gray-400">
                 {artwork.year}
               </span>
             </div>
@@ -124,7 +124,7 @@ const ArtworkCard: React.FC<ArtworkCardProps> = ({ artwork, index = 0 }) => {
                 {artwork.tags.slice(0, 3).map((tag) => (
                   <span
                     key={tag}
-                    className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-md"
+                    className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-xs rounded-md"
                   >
                     #{tag}
                   </span>

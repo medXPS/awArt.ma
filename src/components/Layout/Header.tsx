@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Palette, ShoppingCart, User, Globe, LogOut, Menu, X, Search, Heart, Sun, Moon, Settings } from 'lucide-react';
+import { Palette, ShoppingCart, User, Globe, LogOut, Menu, X, Sun, Moon, Settings } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from '../../stores/authStore';
 import { useCartStore } from '../../stores/cartStore';
 import { useThemeStore } from '../../stores/themeStore';
+import SearchBar from '../Common/SearchBar';
+import { useArtworkStore } from '../../stores/artworkStore';
 
 const Header: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { user, isAuthenticated, logout } = useAuthStore();
   const { toggleCart, getTotalItems } = useCartStore();
   const { isDark, toggleTheme } = useThemeStore();
+  const { setFilters } = useArtworkStore();
   const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -27,6 +30,13 @@ const Header: React.FC = () => {
   };
 
   const totalItems = getTotalItems();
+
+  const handleSearch = (query: string) => {
+    setFilters({ search: query });
+    if (query && window.location.pathname !== '/artworks') {
+      navigate('/artworks');
+    }
+  };
 
   // Handle scroll effect
   useEffect(() => {
@@ -99,6 +109,11 @@ const Header: React.FC = () => {
               ))}
             </div>
 
+            {/* Search Bar - Desktop */}
+            <div className="hidden lg:block flex-1 max-w-md mx-8">
+              <SearchBar onSearch={handleSearch} />
+            </div>
+
             {/* Right Side Actions */}
             <div className="flex items-center space-x-4">
               {/* Theme Toggle */}
@@ -109,15 +124,6 @@ const Header: React.FC = () => {
                 className="p-2 text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
               >
                 {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-              </motion.button>
-
-              {/* Search Button */}
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                className="hidden md:flex p-2 text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
-              >
-                <Search className="h-5 w-5" />
               </motion.button>
 
               {/* Language Selector */}
@@ -247,6 +253,11 @@ const Header: React.FC = () => {
               className="lg:hidden bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-t border-gray-200/50 dark:border-gray-700/50"
             >
               <div className="px-4 py-6 space-y-4">
+                {/* Mobile Search */}
+                <div className="mb-4">
+                  <SearchBar onSearch={handleSearch} />
+                </div>
+                
                 {navItems.map((item) => (
                   <Link
                     key={item.to}

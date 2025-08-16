@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './i18n';
+import { useThemeStore } from './stores/themeStore';
 import Header from './components/Layout/Header';
 import Footer from './components/Layout/Footer';
 import CartSidebar from './components/Cart/CartSidebar';
@@ -15,9 +16,20 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 
 function App() {
+  const { isDark } = useThemeStore();
+  
+  // Apply theme class to document
+  React.useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDark]);
+
   return (
     <Router>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
         <Header />
         <main>
           <Routes>

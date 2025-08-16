@@ -1,14 +1,17 @@
 import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowRight, Palette, Award, Users, Star, Play, Sparkles, TrendingUp, Heart, Eye, Zap, Shield, Globe } from 'lucide-react';
+import { ArrowRight, Palette, Award, Users, Star, Play, Sparkles, TrendingUp, Heart, Eye, Zap, Shield, Globe, Search } from 'lucide-react';
 import { motion, useScroll, useTransform, useInView } from 'framer-motion';
 import { useArtworkStore } from '../stores/artworkStore';
 import ArtworkCard from '../components/Common/ArtworkCard';
+import SearchBar from '../components/Common/SearchBar';
+import { useNavigate } from 'react-router-dom';
 
 const Home: React.FC = () => {
   const { t } = useTranslation();
-  const { getFeaturedArtworks } = useArtworkStore();
+  const { getFeaturedArtworks, setFilters } = useArtworkStore();
+  const navigate = useNavigate();
   const featuredArtworks = getFeaturedArtworks();
   
   const heroRef = useRef(null);
@@ -24,6 +27,11 @@ const Home: React.FC = () => {
   const featuresInView = useInView(featuresRef, { once: true, margin: "-100px" });
   const artworksInView = useInView(artworksRef, { once: true, margin: "-100px" });
   const statsInView = useInView(statsRef, { once: true, margin: "-100px" });
+
+  const handleSearch = (query: string) => {
+    setFilters({ search: query });
+    navigate('/artworks');
+  };
 
   const stats = [
     { number: "15K+", label: "Artworks", icon: Palette, color: "from-purple-500 to-pink-500" },
@@ -172,11 +180,25 @@ const Home: React.FC = () => {
                 </motion.div>
               </motion.div>
 
+              {/* Hero Search Bar */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={heroInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ delay: 1.2, duration: 0.8 }}
+                className="max-w-2xl mx-auto lg:mx-0"
+              >
+                <SearchBar 
+                  onSearch={handleSearch}
+                  placeholder="Search for Moroccan art, artists, or styles..."
+                  className="w-full"
+                />
+              </motion.div>
+
               {/* Stats Preview */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={heroInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ delay: 1, duration: 0.8 }}
+                transition={{ delay: 1.4, duration: 0.8 }}
                 className="flex items-center justify-center lg:justify-start space-x-8 mt-12"
               >
                 <div className="text-center">
@@ -463,6 +485,15 @@ const Home: React.FC = () => {
               Join thousands of art enthusiasts and discover your next favorite piece from Morocco's finest artists. 
               Whether you're collecting or creating, your artistic adventure starts here.
             </p>
+            
+            {/* CTA Search */}
+            <div className="max-w-2xl mx-auto mb-8">
+              <SearchBar 
+                onSearch={handleSearch}
+                placeholder="What kind of Moroccan art are you looking for?"
+              />
+            </div>
+            
             <div className="flex flex-col sm:flex-row gap-6 justify-center">
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Link
