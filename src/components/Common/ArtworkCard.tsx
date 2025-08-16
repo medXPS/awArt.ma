@@ -18,6 +18,7 @@ const ArtworkCard: React.FC<ArtworkCardProps> = ({ artwork, index = 0 }) => {
   const { addItem } = useCartStore();
   const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlistStore();
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
   
   const isLiked = isInWishlist(artwork.id);
   
@@ -44,12 +45,20 @@ const ArtworkCard: React.FC<ArtworkCardProps> = ({ artwork, index = 0 }) => {
     }
   };
 
+  const handleImageLoad = () => {
+    setImageLoaded(true);
+  };
+
+  const handleImageError = () => {
+    setImageError(true);
+    setImageLoaded(true);
+  };
   return (
     <motion.div
       ref={ref}
       initial={{ opacity: 0, y: 50 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ delay: index * 0.1, duration: 0.6 }}
+      transition={{ delay: Math.min(index * 0.05, 0.5), duration: 0.4 }}
       className="group h-full"
     >
       <Link to={`/artwork/${artwork.id}`} className="block h-full">
@@ -58,19 +67,26 @@ const ArtworkCard: React.FC<ArtworkCardProps> = ({ artwork, index = 0 }) => {
           {/* Image Container - Fixed Height */}
           <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800">
             {/* Loading Skeleton */}
-            {!imageLoaded && (
+            {!imageLoaded && !imageError && (
               <div className="absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700 animate-pulse" />
             )}
             
-            <img
-              src={artwork.imageUrl}
-              alt={artwork.title}
-              className={`w-full h-full object-cover transition-all duration-700 ${
-                imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-110'
-              } group-hover:scale-110`}
-              loading="lazy"
-              onLoad={() => setImageLoaded(true)}
-            />
+            {!imageError ? (
+              <img
+                src={artwork.imageUrl}
+                alt={artwork.title}
+                className={`w-full h-full object-cover transition-all duration-300 ${
+                  imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
+                } group-hover:scale-105`}
+                loading="lazy"
+                onLoad={handleImageLoad}
+                onError={handleImageError}
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-gray-200 dark:bg-gray-700">
+                <Palette className="h-16 w-16 text-gray-400 dark:text-gray-500" />
+              </div>
+            )}
             
             {/* Gradient Overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />

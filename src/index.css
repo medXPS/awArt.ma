@@ -7,6 +7,15 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Force dark mode styles */
+.dark {
+  color-scheme: dark;
+}
+
+.dark * {
+  border-color: rgb(55 65 81 / 1) !important;
+}
+
 /* RTL Support */
 [dir="rtl"] {
   text-align: right;
@@ -83,8 +92,17 @@ html {
 }
 
 /* Smooth transitions for theme switching */
-* {
+*, *::before, *::after {
   transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+/* Optimize animations for performance */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Custom animations */
