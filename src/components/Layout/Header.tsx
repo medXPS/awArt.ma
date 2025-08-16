@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Palette, ShoppingCart, User, Globe, LogOut, Menu, X, Sun, Moon, Settings, Bell, Search, Heart } from 'lucide-react';
+import { Palette, ShoppingCart, User, Globe, LogOut, Menu, X, Sun, Moon, Settings, Bell, Search, Heart, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from '../../stores/authStore';
 import { useCartStore } from '../../stores/cartStore';
@@ -26,7 +26,7 @@ const Header: React.FC = () => {
   const [showSearch, setShowSearch] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showLangMenu, setShowLangMenu] = useState(false);
-  const [showNotifications, setShowNotifications] = useState(false);
+  const [showCategoryMenu, setShowCategoryMenu] = useState(false);
 
   const isRTL = i18n.language === 'ar';
 
@@ -41,6 +41,12 @@ const Header: React.FC = () => {
     logout();
     navigate('/');
     setShowUserMenu(false);
+  };
+
+  const handleCategoryFilter = (category: string) => {
+    setFilters({ category });
+    navigate('/artworks');
+    setShowCategoryMenu(false);
   };
 
   const totalItems = getTotalItems();
@@ -69,7 +75,7 @@ const Header: React.FC = () => {
     const handleClickOutside = () => {
       setShowUserMenu(false);
       setShowLangMenu(false);
-      setShowNotifications(false);
+      setShowCategoryMenu(false);
     };
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
@@ -77,7 +83,17 @@ const Header: React.FC = () => {
 
   const navItems = [
     { to: '/', label: t('home'), icon: '🏠' },
-    { to: '/artworks', label: t('artworks'), icon: '🎨' },
+    { 
+      to: '/artworks', 
+      label: t('artworks'), 
+      icon: '🎨',
+      hasDropdown: true,
+      dropdownItems: [
+        { label: 'All Artworks', action: () => handleCategoryFilter('') },
+        { label: 'Physical Art', action: () => handleCategoryFilter('physical') },
+        { label: 'Digital Art', action: () => handleCategoryFilter('digital') }
+      ]
+    },
     { to: '/artists', label: t('artists'), icon: '👨‍🎨' },
     { to: '/about', label: t('about'), icon: 'ℹ️' },
   ];
@@ -96,7 +112,7 @@ const Header: React.FC = () => {
         transition={{ duration: 0.6, ease: "easeOut" }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
           isScrolled 
-            ? 'bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-2xl border-b border-gray-200/50 dark:border-gray-700/50' 
+            ? 'bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl shadow-2xl border-b border-slate-200/50 dark:border-slate-700/50' 
             : 'bg-transparent'
         }`}
         dir={isRTL ? 'rtl' : 'ltr'}
@@ -122,17 +138,17 @@ const Header: React.FC = () => {
                       repeat: Infinity,
                       ease: "easeInOut"
                     }}
-                    className="absolute inset-0 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 rounded-2xl blur-lg opacity-75 group-hover:opacity-100 transition-opacity"
+                    className="absolute inset-0 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 rounded-2xl blur-lg opacity-75 group-hover:opacity-100 transition-opacity"
                   />
-                  <div className="relative bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 p-3 rounded-2xl shadow-2xl group-hover:shadow-purple-500/25 transition-all duration-300">
+                  <div className="relative bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 p-3 rounded-2xl shadow-2xl group-hover:shadow-amber-500/25 transition-all duration-300 border border-amber-400/50">
                     <Palette className="h-8 w-8 text-white" />
                   </div>
                 </div>
                 <div className="hidden sm:block">
-                  <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent">
+                  <span className="text-2xl font-bold bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 bg-clip-text text-transparent">
                     awArt.ma
                   </span>
-                  <div className="text-xs text-gray-500 dark:text-gray-400 -mt-1 font-medium">
+                  <div className="text-xs text-slate-500 dark:text-slate-400 -mt-1 font-medium">
                     {isRTL ? 'سوق الفن المغربي' : 'Moroccan Art Marketplace'}
                   </div>
                 </div>
@@ -149,20 +165,64 @@ const Header: React.FC = () => {
                   transition={{ delay: index * 0.1 + 0.3 }}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
+                  className="relative"
                 >
-                  <Link
-                    to={item.to}
-                    className="relative text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-all duration-300 font-semibold group px-4 py-2 rounded-xl hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:shadow-lg"
-                  >
-                    <span className="flex items-center space-x-2 rtl:space-x-reverse">
-                      <span className="text-sm transition-transform duration-300">{item.icon}</span>
-                      <span>{item.label}</span>
-                    </span>
-                    <motion.span 
-                      className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-purple-500 to-pink-500 group-hover:w-full transition-all duration-300 rounded-full"
-                      whileHover={{ width: "100%" }}
-                    />
-                  </Link>
+                  {item.hasDropdown ? (
+                    <div className="relative">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowCategoryMenu(!showCategoryMenu);
+                        }}
+                        className="relative text-slate-700 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-400 transition-all duration-300 font-semibold group px-4 py-2 rounded-xl hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:shadow-lg flex items-center space-x-1"
+                      >
+                        <span className="flex items-center space-x-2 rtl:space-x-reverse">
+                          <span className="text-sm transition-transform duration-300">{item.icon}</span>
+                          <span>{item.label}</span>
+                        </span>
+                        <ChevronDown className="h-4 w-4 ml-1 transition-transform duration-200" />
+                        <motion.span 
+                          className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-amber-500 to-orange-500 group-hover:w-full transition-all duration-300 rounded-full"
+                          whileHover={{ width: "100%" }}
+                        />
+                      </button>
+                      
+                      <AnimatePresence>
+                        {showCategoryMenu && (
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                            className={`absolute ${isRTL ? 'right-0' : 'left-0'} mt-2 w-48 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl border border-slate-200/50 dark:border-slate-700/50 rounded-2xl shadow-2xl z-50 overflow-hidden`}
+                          >
+                            {item.dropdownItems?.map((dropdownItem) => (
+                              <button
+                                key={dropdownItem.label}
+                                onClick={dropdownItem.action}
+                                className="block w-full text-left px-4 py-3 text-sm transition-colors hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:text-amber-600 dark:hover:text-amber-400 text-slate-700 dark:text-slate-300 font-medium"
+                              >
+                                {dropdownItem.label}
+                              </button>
+                            ))}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  ) : (
+                    <Link
+                      to={item.to}
+                      className="relative text-slate-700 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-400 transition-all duration-300 font-semibold group px-4 py-2 rounded-xl hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:shadow-lg"
+                    >
+                      <span className="flex items-center space-x-2 rtl:space-x-reverse">
+                        <span className="text-sm transition-transform duration-300">{item.icon}</span>
+                        <span>{item.label}</span>
+                      </span>
+                      <motion.span 
+                        className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-amber-500 to-orange-500 group-hover:w-full transition-all duration-300 rounded-full"
+                        whileHover={{ width: "100%" }}
+                      />
+                    </Link>
+                  )}
                 </motion.div>
               ))}
             </div>
@@ -180,7 +240,7 @@ const Header: React.FC = () => {
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={() => setShowSearch(!showSearch)}
-                className="xl:hidden p-2.5 text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors rounded-xl hover:bg-purple-50 dark:hover:bg-purple-900/20"
+                className="xl:hidden p-2.5 text-slate-600 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 transition-colors rounded-xl hover:bg-amber-50 dark:hover:bg-amber-900/20"
               >
                 <Search className="h-5 w-5" />
               </motion.button>
@@ -190,7 +250,7 @@ const Header: React.FC = () => {
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={toggleTheme}
-                className="p-2.5 text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-all duration-300 rounded-xl hover:bg-purple-50 dark:hover:bg-purple-900/20"
+                className="p-2.5 text-slate-600 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 transition-all duration-300 rounded-xl hover:bg-amber-50 dark:hover:bg-amber-900/20"
               >
                 <AnimatePresence mode="wait">
                   {isDark ? (
@@ -225,7 +285,7 @@ const Header: React.FC = () => {
                     e.stopPropagation();
                     setShowLangMenu(!showLangMenu);
                   }}
-                  className="flex items-center space-x-2 rtl:space-x-reverse text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors px-3 py-2.5 rounded-xl hover:bg-purple-50 dark:hover:bg-purple-900/20"
+                  className="flex items-center space-x-2 rtl:space-x-reverse text-slate-700 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors px-3 py-2.5 rounded-xl hover:bg-amber-50 dark:hover:bg-amber-900/20"
                 >
                   <Globe className="h-4 w-4" />
                   <span className="text-sm font-semibold hidden sm:block">
@@ -239,14 +299,14 @@ const Header: React.FC = () => {
                       initial={{ opacity: 0, scale: 0.95, y: -10 }}
                       animate={{ opacity: 1, scale: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                      className={`absolute ${isRTL ? 'left-0' : 'right-0'} mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-2xl z-50 overflow-hidden`}
+                      className={`absolute ${isRTL ? 'left-0' : 'right-0'} mt-2 w-48 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl border border-slate-200/50 dark:border-slate-700/50 rounded-2xl shadow-2xl z-50 overflow-hidden`}
                     >
                       {languages.map((lang) => (
                         <button
                           key={lang.code}
                           onClick={() => handleLanguageChange(lang.code)}
-                          className={`block w-full text-left px-4 py-3 text-sm transition-colors hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:text-purple-600 dark:hover:text-purple-400 ${
-                            i18n.language === lang.code ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400' : 'text-gray-700 dark:text-gray-300'
+                          className={`block w-full text-left px-4 py-3 text-sm transition-colors hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:text-amber-600 dark:hover:text-amber-400 ${
+                            i18n.language === lang.code ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400' : 'text-slate-700 dark:text-slate-300'
                           }`}
                         >
                           <span className="flex items-center space-x-3 rtl:space-x-reverse">
@@ -270,7 +330,7 @@ const Header: React.FC = () => {
                       e.stopPropagation();
                       toggleNotifications();
                     }}
-                    className="relative p-2.5 text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors rounded-xl hover:bg-purple-50 dark:hover:bg-purple-900/20"
+                    className="relative p-2.5 text-slate-600 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 transition-colors rounded-xl hover:bg-amber-50 dark:hover:bg-amber-900/20"
                   >
                     <Bell className="h-5 w-5" />
                     {unreadNotifications > 0 && (
@@ -292,7 +352,7 @@ const Header: React.FC = () => {
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={toggleWishlist}
-                className="relative p-2.5 text-gray-600 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20"
+                className="relative p-2.5 text-slate-600 dark:text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20"
               >
                 <Heart className="h-5 w-5" />
                 {wishlistItems > 0 && (
@@ -311,14 +371,14 @@ const Header: React.FC = () => {
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={toggleCart}
-                className="relative p-2.5 text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors rounded-xl hover:bg-purple-50 dark:hover:bg-purple-900/20"
+                className="relative p-2.5 text-slate-700 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors rounded-xl hover:bg-amber-50 dark:hover:bg-amber-900/20"
               >
                 <ShoppingCart className="h-6 w-6" />
                 {totalItems > 0 && (
                   <motion.span
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    className="absolute -top-1 -right-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center font-bold shadow-lg"
+                    className="absolute -top-1 -right-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center font-bold shadow-lg"
                   >
                     {totalItems > 99 ? '99+' : totalItems}
                   </motion.span>
@@ -334,22 +394,22 @@ const Header: React.FC = () => {
                       e.stopPropagation();
                       setShowUserMenu(!showUserMenu);
                     }}
-                    className="flex items-center space-x-3 rtl:space-x-reverse text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors px-3 py-2 rounded-xl hover:bg-purple-50 dark:hover:bg-purple-900/20"
+                    className="flex items-center space-x-3 rtl:space-x-reverse text-slate-700 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors px-3 py-2 rounded-xl hover:bg-amber-50 dark:hover:bg-amber-900/20"
                   >
                     {user?.avatar ? (
                       <img 
                         src={user.avatar} 
                         alt={user.name} 
-                        className="h-10 w-10 rounded-full object-cover ring-2 ring-purple-200 dark:ring-purple-800 shadow-lg" 
+                        className="h-10 w-10 rounded-full object-cover ring-2 ring-amber-200 dark:ring-amber-800 shadow-lg" 
                       />
                     ) : (
-                      <div className="h-10 w-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-lg">
+                      <div className="h-10 w-10 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
                         <User className="h-5 w-5 text-white" />
                       </div>
                     )}
                     <div className="hidden sm:block text-left rtl:text-right">
                       <p className="text-sm font-semibold">{user?.name}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">{user?.role}</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 capitalize">{user?.role}</p>
                     </div>
                   </motion.button>
                   
@@ -359,15 +419,15 @@ const Header: React.FC = () => {
                         initial={{ opacity: 0, scale: 0.95, y: -10 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                        className={`absolute ${isRTL ? 'left-0' : 'right-0'} mt-2 w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-2xl z-50 overflow-hidden`}
+                        className={`absolute ${isRTL ? 'left-0' : 'right-0'} mt-2 w-56 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl border border-slate-200/50 dark:border-slate-700/50 rounded-2xl shadow-2xl z-50 overflow-hidden`}
                       >
-                        <div className="p-4 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20">
-                          <p className="font-semibold text-gray-900 dark:text-white">{user?.name}</p>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">{user?.email}</p>
+                        <div className="p-4 border-b border-slate-100 dark:border-slate-700 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20">
+                          <p className="font-semibold text-slate-900 dark:text-white">{user?.name}</p>
+                          <p className="text-sm text-slate-500 dark:text-slate-400">{user?.email}</p>
                           <div className="flex items-center mt-2">
                             <span className={`px-2 py-1 text-xs rounded-full font-medium ${
                               user?.role === 'admin' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' :
-                              user?.role === 'artist' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300' :
+                              user?.role === 'artist' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300' :
                               'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
                             }`}>
                               {user?.role}
@@ -378,7 +438,7 @@ const Header: React.FC = () => {
                         <Link
                           to="/dashboard"
                           onClick={() => setShowUserMenu(false)}
-                          className="flex items-center px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                          className="flex items-center px-4 py-3 text-sm text-slate-700 dark:text-slate-300 hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:text-amber-600 dark:hover:text-amber-400 transition-colors"
                         >
                           <User className="h-4 w-4 mr-3 rtl:ml-3 rtl:mr-0" />
                           {t('dashboard')}
@@ -387,7 +447,7 @@ const Header: React.FC = () => {
                         <Link
                           to="/profile"
                           onClick={() => setShowUserMenu(false)}
-                          className="flex items-center px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
+                          className="flex items-center px-4 py-3 text-sm text-slate-700 dark:text-slate-300 hover:bg-amber-50 dark:hover:bg-amber-900/20 hover:text-amber-600 dark:hover:text-amber-400 transition-colors"
                         >
                           <Settings className="h-4 w-4 mr-3 rtl:ml-3 rtl:mr-0" />
                           Profile Settings
@@ -395,7 +455,7 @@ const Header: React.FC = () => {
                         
                         <button
                           onClick={handleLogout}
-                          className="flex items-center w-full text-left px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-colors border-t border-gray-100 dark:border-gray-700"
+                          className="flex items-center w-full text-left px-4 py-3 text-sm text-slate-700 dark:text-slate-300 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 transition-colors border-t border-slate-100 dark:border-slate-700"
                         >
                           <LogOut className="h-4 w-4 mr-3 rtl:ml-3 rtl:mr-0" />
                           {t('logout')}
@@ -408,14 +468,14 @@ const Header: React.FC = () => {
                 <div className="hidden md:flex items-center space-x-3 rtl:space-x-reverse">
                   <Link
                     to="/login"
-                    className="text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors font-semibold px-4 py-2 rounded-xl hover:bg-purple-50 dark:hover:bg-purple-900/20"
+                    className="text-slate-700 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors font-semibold px-4 py-2 rounded-xl hover:bg-amber-50 dark:hover:bg-amber-900/20"
                   >
                     {t('login')}
                   </Link>
                   <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                     <Link
                       to="/register"
-                      className="bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 text-white px-6 py-2.5 rounded-xl hover:from-purple-700 hover:via-pink-700 hover:to-orange-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl"
+                      className="bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 text-white px-6 py-2.5 rounded-xl hover:from-amber-700 hover:via-orange-700 hover:to-red-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl border border-amber-400/50"
                     >
                       {t('register')}
                     </Link>
@@ -428,7 +488,7 @@ const Header: React.FC = () => {
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="lg:hidden p-2.5 text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors rounded-xl hover:bg-purple-50 dark:hover:bg-purple-900/20"
+                className="lg:hidden p-2.5 text-slate-700 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors rounded-xl hover:bg-amber-50 dark:hover:bg-amber-900/20"
               >
                 <AnimatePresence mode="wait">
                   {isMobileMenuOpen ? (
@@ -465,7 +525,7 @@ const Header: React.FC = () => {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="xl:hidden bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-t border-gray-200/50 dark:border-gray-700/50"
+              className="xl:hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-slate-200/50 dark:border-slate-700/50"
             >
               <div className="px-4 py-4">
                 <SearchBar onSearch={handleSearch} />
@@ -481,7 +541,7 @@ const Header: React.FC = () => {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="lg:hidden bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-t border-gray-200/50 dark:border-gray-700/50"
+              className="lg:hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-slate-200/50 dark:border-slate-700/50"
             >
               <div className="px-4 py-6 space-y-4">
                 {navItems.map((item, index) => (
@@ -494,7 +554,7 @@ const Header: React.FC = () => {
                     <Link
                       to={item.to}
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="flex items-center space-x-3 rtl:space-x-reverse text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors font-semibold py-3 px-4 rounded-xl hover:bg-purple-50 dark:hover:bg-purple-900/20"
+                      className="flex items-center space-x-3 rtl:space-x-reverse text-slate-700 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors font-semibold py-3 px-4 rounded-xl hover:bg-amber-50 dark:hover:bg-amber-900/20"
                     >
                       <span className="text-lg">{item.icon}</span>
                       <span>{item.label}</span>
@@ -503,18 +563,18 @@ const Header: React.FC = () => {
                 ))}
                 
                 {!isAuthenticated && (
-                  <div className="pt-4 border-t border-gray-200 dark:border-gray-700 space-y-3">
+                  <div className="pt-4 border-t border-slate-200 dark:border-slate-700 space-y-3">
                     <Link
                       to="/login"
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="block text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors font-semibold py-3 px-4 rounded-xl hover:bg-purple-50 dark:hover:bg-purple-900/20"
+                      className="block text-slate-700 dark:text-slate-300 hover:text-amber-600 dark:hover:text-amber-400 transition-colors font-semibold py-3 px-4 rounded-xl hover:bg-amber-50 dark:hover:bg-amber-900/20"
                     >
                       {t('login')}
                     </Link>
                     <Link
                       to="/register"
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="block bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 text-white px-6 py-3 rounded-xl text-center font-semibold shadow-lg"
+                      className="block bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 text-white px-6 py-3 rounded-xl text-center font-semibold shadow-lg border border-amber-400/50"
                     >
                       {t('register')}
                     </Link>

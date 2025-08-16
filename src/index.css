@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Moroccan-inspired color palette */
+:root {
+  --moroccan-amber: #f59e0b;
+  --moroccan-orange: #ea580c;
+  --moroccan-red: #dc2626;
+  --moroccan-blue: #1e40af;
+  --moroccan-teal: #0d9488;
+  --moroccan-gold: #d97706;
+}
+
 /* Smooth scrolling */
 html {
   scroll-behavior: smooth;
