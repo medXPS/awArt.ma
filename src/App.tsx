@@ -6,6 +6,7 @@ import { useThemeStore } from './stores/themeStore';
 import Header from './components/Layout/Header';
 import Footer from './components/Layout/Footer';
 import CartSidebar from './components/Cart/CartSidebar';
+import WishlistSidebar from './components/Wishlist/WishlistSidebar';
 import ProfileSettings from './components/Profile/ProfileSettings';
 import Home from './pages/Home';
 import Artworks from './pages/Artworks';
@@ -55,6 +56,7 @@ function App() {
         </main>
         <Footer />
         <CartSidebar />
+        <WishlistSidebar />
       </div>
     </Router>
   );

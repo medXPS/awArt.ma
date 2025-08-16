@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { Artwork } from '../../stores/artworkStore';
 import { useCartStore } from '../../stores/cartStore';
+import { useWishlistStore } from '../../stores/wishlistStore';
 
 interface ArtworkCardProps {
   artwork: Artwork;
@@ -15,8 +16,10 @@ interface ArtworkCardProps {
 const ArtworkCard: React.FC<ArtworkCardProps> = ({ artwork, index = 0 }) => {
   const { t } = useTranslation();
   const { addItem } = useCartStore();
-  const [isLiked, setIsLiked] = useState(false);
+  const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlistStore();
   const [imageLoaded, setImageLoaded] = useState(false);
+  
+  const isLiked = isInWishlist(artwork.id);
   
   const { ref, inView } = useInView({
     threshold: 0.1,
@@ -34,7 +37,11 @@ const ArtworkCard: React.FC<ArtworkCardProps> = ({ artwork, index = 0 }) => {
   const handleLike = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsLiked(!isLiked);
+    if (isLiked) {
+      removeFromWishlist(artwork.id);
+    } else {
+      addToWishlist(artwork);
+    }
   };
 
   return (

@@ -5,14 +5,19 @@ import { Palette, ShoppingCart, User, Globe, LogOut, Menu, X, Sun, Moon, Setting
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from '../../stores/authStore';
 import { useCartStore } from '../../stores/cartStore';
+import { useWishlistStore } from '../../stores/wishlistStore';
+import { useNotificationStore } from '../../stores/notificationStore';
 import { useThemeStore } from '../../stores/themeStore';
 import SearchBar from '../Common/SearchBar';
+import NotificationDropdown from '../Notifications/NotificationDropdown';
 import { useArtworkStore } from '../../stores/artworkStore';
 
 const Header: React.FC = () => {
   const { t, i18n } = useTranslation();
   const { user, isAuthenticated, logout } = useAuthStore();
   const { toggleCart, getTotalItems } = useCartStore();
+  const { toggleWishlist, getTotalItems: getWishlistItems } = useWishlistStore();
+  const { toggleNotifications, getUnreadCount } = useNotificationStore();
   const { isDark, toggleTheme } = useThemeStore();
   const { setFilters } = useArtworkStore();
   const navigate = useNavigate();
@@ -21,6 +26,7 @@ const Header: React.FC = () => {
   const [showSearch, setShowSearch] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showLangMenu, setShowLangMenu] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
 
   const isRTL = i18n.language === 'ar';
 
@@ -38,6 +44,8 @@ const Header: React.FC = () => {
   };
 
   const totalItems = getTotalItems();
+  const wishlistItems = getWishlistItems();
+  const unreadNotifications = getUnreadCount();
 
   const handleSearch = (query: string) => {
     setFilters({ search: query });
@@ -61,6 +69,7 @@ const Header: React.FC = () => {
     const handleClickOutside = () => {
       setShowUserMenu(false);
       setShowLangMenu(false);
+      setShowNotifications(false);
     };
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
@@ -87,7 +96,7 @@ const Header: React.FC = () => {
         transition={{ duration: 0.6, ease: "easeOut" }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
           isScrolled 
-            ? 'bg-white/90 dark:bg-gray-900/90 backdrop-blur-2xl shadow-2xl border-b border-gray-200/50 dark:border-gray-700/50' 
+            ? 'bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl shadow-2xl border-b border-gray-200/50 dark:border-gray-700/50' 
             : 'bg-transparent'
         }`}
         dir={isRTL ? 'rtl' : 'ltr'}
@@ -103,7 +112,18 @@ const Header: React.FC = () => {
             >
               <Link to="/" className="flex items-center space-x-3 rtl:space-x-reverse group">
                 <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 rounded-2xl blur-lg opacity-75 group-hover:opacity-100 transition-opacity animate-pulse"></div>
+                  <motion.div
+                    animate={{
+                      rotate: [0, 5, -5, 0],
+                      scale: [1, 1.05, 1],
+                    }}
+                    transition={{
+                      duration: 4,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                    className="absolute inset-0 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 rounded-2xl blur-lg opacity-75 group-hover:opacity-100 transition-opacity"
+                  />
                   <div className="relative bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 p-3 rounded-2xl shadow-2xl group-hover:shadow-purple-500/25 transition-all duration-300">
                     <Palette className="h-8 w-8 text-white" />
                   </div>
@@ -136,7 +156,10 @@ const Header: React.FC = () => {
                       <span className="text-sm">{item.icon}</span>
                       <span>{item.label}</span>
                     </span>
-                    <span className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 group-hover:w-full transition-all duration-300"></span>
+                    <motion.span 
+                      className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 group-hover:w-full transition-all duration-300"
+                      whileHover={{ width: "100%" }}
+                    />
                   </Link>
                 </motion.div>
               ))}
@@ -148,7 +171,7 @@ const Header: React.FC = () => {
             </div>
 
             {/* Right Side Actions */}
-            <div className={`flex items-center space-x-3 rtl:space-x-reverse ${isRTL ? 'order-2' : 'order-3'}`}>
+            <div className={`flex items-center space-x-2 rtl:space-x-reverse ${isRTL ? 'order-2' : 'order-3'}`}>
               
               {/* Mobile Search Toggle */}
               <motion.button
@@ -162,7 +185,7 @@ const Header: React.FC = () => {
 
               {/* Theme Toggle */}
               <motion.button
-                whileHover={{ scale: 1.1, rotate: 180 }}
+                whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={toggleTheme}
                 className="p-2.5 text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-all duration-300 rounded-xl hover:bg-purple-50 dark:hover:bg-purple-900/20"
@@ -237,28 +260,49 @@ const Header: React.FC = () => {
 
               {/* Notifications (for authenticated users) */}
               {isAuthenticated && (
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  className="relative p-2.5 text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors rounded-xl hover:bg-purple-50 dark:hover:bg-purple-900/20"
-                >
-                  <Bell className="h-5 w-5" />
-                  <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold shadow-lg">
-                    3
-                  </span>
-                </motion.button>
+                <div className="relative">
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleNotifications();
+                    }}
+                    className="relative p-2.5 text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors rounded-xl hover:bg-purple-50 dark:hover:bg-purple-900/20"
+                  >
+                    <Bell className="h-5 w-5" />
+                    {unreadNotifications > 0 && (
+                      <motion.span
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold shadow-lg"
+                      >
+                        {unreadNotifications > 9 ? '9+' : unreadNotifications}
+                      </motion.span>
+                    )}
+                  </motion.button>
+                  <NotificationDropdown />
+                </div>
               )}
 
-              {/* Favorites (for authenticated users) */}
-              {isAuthenticated && (
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  className="p-2.5 text-gray-600 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20"
-                >
-                  <Heart className="h-5 w-5" />
-                </motion.button>
-              )}
+              {/* Wishlist */}
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={toggleWishlist}
+                className="relative p-2.5 text-gray-600 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors rounded-xl hover:bg-red-50 dark:hover:bg-red-900/20"
+              >
+                <Heart className="h-5 w-5" />
+                {wishlistItems > 0 && (
+                  <motion.span
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold shadow-lg"
+                  >
+                    {wishlistItems > 9 ? '9+' : wishlistItems}
+                  </motion.span>
+                )}
+              </motion.button>
 
               {/* Cart */}
               <motion.button
@@ -315,9 +359,18 @@ const Header: React.FC = () => {
                         exit={{ opacity: 0, scale: 0.95, y: -10 }}
                         className={`absolute ${isRTL ? 'left-0' : 'right-0'} mt-2 w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-2xl z-50 overflow-hidden`}
                       >
-                        <div className="p-4 border-b border-gray-100 dark:border-gray-700">
+                        <div className="p-4 border-b border-gray-100 dark:border-gray-700 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20">
                           <p className="font-semibold text-gray-900 dark:text-white">{user?.name}</p>
                           <p className="text-sm text-gray-500 dark:text-gray-400">{user?.email}</p>
+                          <div className="flex items-center mt-2">
+                            <span className={`px-2 py-1 text-xs rounded-full font-medium ${
+                              user?.role === 'admin' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' :
+                              user?.role === 'artist' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300' :
+                              'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
+                            }`}>
+                              {user?.role}
+                            </span>
+                          </div>
                         </div>
                         
                         <Link

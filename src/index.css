@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
 /* RTL Support */
 [dir="rtl"] {
   text-align: right;
@@ -66,9 +71,65 @@
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
   }
+  
+  /* Backdrop blur support */
+  .backdrop-blur-xl {
+    backdrop-filter: blur(24px);
+  }
+  
+  .backdrop-blur-2xl {
+    backdrop-filter: blur(40px);
+  }
 }
 
 /* Smooth transitions for theme switching */
 * {
   transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+/* Custom animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(168, 85, 247, 0.5); }
+  50% { box-shadow: 0 0 40px rgba(236, 72, 153, 0.8); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+/* Improved focus styles */
+.focus-visible:focus {
+  outline: 2px solid theme('colors.purple.500');
+  outline-offset: 2px;
+}
+
+/* Better selection colors */
+::selection {
+  background-color: theme('colors.purple.200');
+  color: theme('colors.purple.900');
+}
+
+::-moz-selection {
+  background-color: theme('colors.purple.200');
+  color: theme('colors.purple.900');
+}
+
+/* Dark mode selection */
+.dark ::selection {
+  background-color: theme('colors.purple.800');
+  color: theme('colors.purple.100');
+}
+
+.dark ::-moz-selection {
+  background-color: theme('colors.purple.800');
+  color: theme('colors.purple.100');
 }
