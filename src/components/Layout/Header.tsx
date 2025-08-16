@@ -147,13 +147,15 @@ const Header: React.FC = () => {
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 + 0.3 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
                   <Link
                     to={item.to}
-                    className="relative text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-all duration-300 font-semibold group px-4 py-2 rounded-xl hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:scale-105 hover:shadow-lg"
+                    className="relative text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-all duration-300 font-semibold group px-4 py-2 rounded-xl hover:bg-purple-50 dark:hover:bg-purple-900/20 hover:shadow-lg"
                   >
-                    <span className="flex items-center space-x-2 rtl:space-x-reverse group-hover:animate-pulse">
-                      <span className="text-sm group-hover:scale-125 transition-transform duration-300">{item.icon}</span>
+                    <span className="flex items-center space-x-2 rtl:space-x-reverse">
+                      <span className="text-sm transition-transform duration-300">{item.icon}</span>
                       <span>{item.label}</span>
                     </span>
                     <motion.span 
